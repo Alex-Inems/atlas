@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useCallback, useRef } from "react";
+import { useReducer, useEffect, useCallback } from "react";
 import {
     createInitialPhaseState,
     phaseMachineReducer,
@@ -27,8 +27,6 @@ export function usePhaseOrchestrator({
     intervalMs = MOTION.hero.phaseIntervalMs,
 }: OrchestratorConfig): PhaseOrchestrator {
     const interval = asMilliseconds(intervalMs);
-    const countRef = useRef(phaseCount);
-    countRef.current = phaseCount;
 
     const [state, dispatch] = useReducer(
         phaseMachineReducer,
@@ -37,8 +35,8 @@ export function usePhaseOrchestrator({
     );
 
     const goTo = useCallback((index: number) => {
-        dispatch({ type: "GOTO", index, now: performance.now(), count: countRef.current });
-    }, []);
+        dispatch({ type: "GOTO", index, now: performance.now(), count: phaseCount });
+    }, [phaseCount]);
 
     useEffect(() => {
         let lastTick = 0;
@@ -47,9 +45,9 @@ export function usePhaseOrchestrator({
         return cinematicTicker.subscribe((now) => {
             if (now - lastTick < throttle) return;
             lastTick = now;
-            dispatch({ type: "TICK", now, interval, count: countRef.current });
+            dispatch({ type: "TICK", now, interval, count: phaseCount });
         });
-    }, [interval]);
+    }, [interval, phaseCount]);
 
     useEffect(() => {
         const onVisibility = () => {

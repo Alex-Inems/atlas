@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useCallback, useEffect, useRef } from "react";
+import { useReducer, useCallback, useEffect } from "react";
 import { selectableReducer, NAVIGABLE_KEYS } from "@/lib/state/selectable";
 
 interface SelectableIndexOptions {
@@ -14,14 +14,11 @@ export function useSelectableIndex({
     initial = 0,
     enableKeyboard = false,
 }: SelectableIndexOptions) {
-    const countRef = useRef(count);
-    countRef.current = count;
-
     const [state, dispatch] = useReducer(selectableReducer, { index: initial });
 
     const select = useCallback((index: number) => {
-        dispatch({ type: "SELECT", index, count: countRef.current });
-    }, []);
+        dispatch({ type: "SELECT", index, count });
+    }, [count]);
 
     useEffect(() => {
         if (!enableKeyboard) return;
@@ -32,13 +29,13 @@ export function useSelectableIndex({
             dispatch({
                 type: "KEY",
                 key: e.key as "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight",
-                count: countRef.current,
+                count,
             });
         };
 
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [enableKeyboard]);
+    }, [enableKeyboard, count]);
 
     return { index: state.index, select };
 }

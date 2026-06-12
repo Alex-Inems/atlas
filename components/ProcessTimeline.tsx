@@ -27,36 +27,39 @@ const ProcessTimeline = () => {
                 </Reveal>
 
                 <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
-                    <div className="lg:col-span-5 space-y-1" role="tablist" aria-label="Process phases">
-                        {processSteps.map((s, i) => (
-                            <button
-                                key={s.num}
-                                type="button"
-                                role="tab"
-                                aria-selected={active === i}
-                                onClick={() => select(i)}
-                                className={`w-full text-left p-5 border-l-2 transition-all ${
-                                    active === i
-                                        ? "border-safety bg-premium"
-                                        : "border-transparent hover:border-charcoal/20"
-                                }`}
-                            >
-                                <span
-                                    className={`font-mono text-xs font-bold ${
-                                        active === i ? "text-safety" : "text-charcoal/20"
-                                    }`}
-                                >
-                                    {s.num}
-                                </span>
-                                <span
-                                    className={`block text-base font-bold mt-1 ${
-                                        active === i ? "text-charcoal" : "text-muted"
-                                    }`}
-                                >
-                                    {s.title}
-                                </span>
-                            </button>
-                        ))}
+                    <div className="lg:col-span-5 space-y-1">
+                        <div role="group" aria-label="Process phases">
+                            {processSteps.map((s, i) => {
+                                const isActive = active === i;
+                                return (
+                                    <button
+                                        key={s.num}
+                                        type="button"
+                                        onClick={() => select(i)}
+                                        className={`w-full text-left p-5 border-l-2 transition-all ${
+                                            isActive
+                                                ? "border-safety bg-premium"
+                                                : "border-transparent hover:border-charcoal/20"
+                                        }`}
+                                    >
+                                        <span
+                                            className={`font-mono text-xs font-bold ${
+                                                isActive ? "text-safety" : "text-charcoal/20"
+                                            }`}
+                                        >
+                                            {s.num}
+                                        </span>
+                                        <span
+                                            className={`block text-base font-bold mt-1 ${
+                                                isActive ? "text-charcoal" : "text-muted"
+                                            }`}
+                                        >
+                                            {s.title}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                         <Link
                             href="/process"
                             className="inline-block mt-6 text-[11px] tracking-[0.2em] uppercase font-bold text-safety hover:text-charcoal transition-colors"
@@ -66,10 +69,7 @@ const ProcessTimeline = () => {
                     </div>
 
                     <Reveal className="lg:col-span-7">
-                        <div
-                            role="tabpanel"
-                            className="bg-charcoal text-white p-10 md:p-14 min-h-[360px] flex flex-col justify-between"
-                        >
+                        <div className="bg-charcoal text-white p-10 md:p-14 min-h-[360px] flex flex-col justify-between">
                             <div>
                                 <span className="text-safety font-mono text-sm font-bold">{step.num}</span>
                                 <h3 className="text-3xl font-black mt-4 mb-6">{step.title}</h3>
