@@ -5,6 +5,8 @@ import { AuthProvider } from "@/components/AuthContext";
 import { MotionPreferenceProvider } from "@/providers/MotionPreferenceProvider";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/JsonLd";
+import { localBusinessJsonLd, siteUrl } from "@/lib/seo/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atlas Build — Construction",
-  description: "Premium commercial and residential construction",
+  metadataBase: new URL(siteUrl),
 };
 
 export default function RootLayout({
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <JsonLd data={localBusinessJsonLd()} />
         <MotionPreferenceProvider>
           <AuthProvider>
             <Navigation />

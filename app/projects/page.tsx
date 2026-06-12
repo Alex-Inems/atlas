@@ -1,14 +1,11 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { landmarkProjects } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo/site";
 
-export const metadata: Metadata = {
-    title: "Projects | Atlas Build",
-    description: "Verified landmark construction completions — The Spiral, Mori JP Tower, Manhattan West, and more.",
-};
+export const metadata = buildMetadata("projects");
 
 export default function ProjectsPage() {
     return (

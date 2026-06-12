@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { blogPosts } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo/site";
 
-export const metadata: Metadata = {
-    title: "Blog | Atlas Build",
-    description: "Construction industry intelligence from verified sources.",
-};
+export const metadata = buildMetadata("blog");
 
 export default function BlogPage() {
     const featured = blogPosts[0];

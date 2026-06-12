@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { processSteps } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo/site";
 
-export const metadata: Metadata = {
-    title: "Process | Atlas Build",
-    description: "Five-phase construction methodology from discovery through closeout.",
-};
+export const metadata = buildMetadata("process");
 
 const phaseImages = [
     "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80",

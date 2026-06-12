@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { leadership, companyInfo } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo/site";
 
-export const metadata: Metadata = {
-    title: "Team | Atlas Build",
-    description: "Atlas Build leadership and operations — PT Atlas Jaya Konstruksi, Jakarta.",
-};
+export const metadata = buildMetadata("team");
 
 export default function TeamPage() {
     return (

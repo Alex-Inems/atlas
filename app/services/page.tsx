@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { services } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo/site";
 
-export const metadata: Metadata = {
-    title: "Services | Atlas Build",
-    description: "General contracting, design-build, structural, MEP, façade, and pre-construction services.",
-};
+export const metadata = buildMetadata("services");
 
 export default function ServicesPage() {
     return (

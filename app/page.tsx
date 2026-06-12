@@ -1,13 +1,8 @@
-"use client";
+import HomePage from "@/components/HomePage";
+import { buildMetadata } from "@/lib/seo/site";
 
-import { HOME_SECTIONS } from "@/lib/content/site-sections";
+export const metadata = buildMetadata("home");
 
-export default function LuxuryConstruction() {
-    return (
-        <div className="bg-white">
-            {HOME_SECTIONS.map(({ id, Component }) => (
-                <Component key={id} />
-            ))}
-        </div>
-    );
+export default function Page() {
+    return <HomePage />;
 }
