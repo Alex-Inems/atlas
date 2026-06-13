@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState, Suspense } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import AuthModal from "./AuthModal";
@@ -25,16 +25,51 @@ import {
 } from "@/lib/navigation/theme";
 import { MOTION } from "@/lib/motion/tokens";
 
-const Navigation = () => {
+function NavigationInner() {
     const pastHero = useScrollPastElement(HERO_ELEMENT_ID, HERO_SCROLL_OFFSET);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [authOpen, setAuthOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const surface = resolveNavSurface(pathname === "/", pastHero);
+    const loginRedirect = searchParams.get("login") === "1" && !user && !isLoading;
 
     useBodyScrollLock(mobileOpen);
+
+    const authLinks = user ? (
+        <>
+            <Link
+                href="/portal"
+                className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
+            >
+                Portal
+            </Link>
+            <Link
+                href="/profile"
+                className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors max-w-[120px] truncate ${navActionClass(surface)}`}
+            >
+                {user.name}
+            </Link>
+            <button
+                type="button"
+                onClick={() => logout()}
+                className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
+            >
+                Log out
+            </button>
+        </>
+    ) : (
+        <button
+            type="button"
+            onClick={() => setAuthOpen(true)}
+            disabled={isLoading}
+            className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors disabled:opacity-50 ${navActionClass(surface)}`}
+        >
+            Portal
+        </button>
+    );
 
     return (
         <>
@@ -72,21 +107,7 @@ const Navigation = () => {
                         </ul>
 
                         <div className="flex items-center gap-4 md:gap-6">
-                            {user ? (
-                                <button
-                                    onClick={logout}
-                                    className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
-                                >
-                                    Log out
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => setAuthOpen(true)}
-                                    className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
-                                >
-                                    Portal
-                                </button>
-                            )}
+                            {authLinks}
 
                             <Link
                                 href="/contact"
@@ -148,18 +169,52 @@ const Navigation = () => {
                                     </Link>
                                 </motion.div>
                             ))}
+                            {user && (
+                                <>
+                                    <Link
+                                        href="/portal"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                    >
+                                        Portal
+                                        <ArrowUpRight className="w-5 h-5 opacity-30" />
+                                    </Link>
+                                    <Link
+                                        href="/profile"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                    >
+                                        {user.name}
+                                        <ArrowUpRight className="w-5 h-5 opacity-30" />
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         <div className="absolute bottom-0 inset-x-0 p-6 border-t border-line flex gap-4">
-                            <button
-                                onClick={() => {
-                                    setAuthOpen(true);
-                                    setMobileOpen(false);
-                                }}
-                                className="flex-1 py-4 text-[11px] tracking-[0.18em] uppercase font-bold text-charcoal border border-line"
-                            >
-                                Portal
-                            </button>
+                            {user ? (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        logout();
+                                        setMobileOpen(false);
+                                    }}
+                                    className="flex-1 py-4 text-[11px] tracking-[0.18em] uppercase font-bold text-charcoal border border-line"
+                                >
+                                    Log out
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setAuthOpen(true);
+                                        setMobileOpen(false);
+                                    }}
+                                    className="flex-1 py-4 text-[11px] tracking-[0.18em] uppercase font-bold text-charcoal border border-line"
+                                >
+                                    Portal
+                                </button>
+                            )}
                             <Link
                                 href="/contact"
                                 onClick={() => setMobileOpen(false)}
@@ -172,9 +227,15 @@ const Navigation = () => {
                 )}
             </AnimatePresence>
 
-            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+            <AuthModal isOpen={authOpen || loginRedirect} onClose={() => setAuthOpen(false)} />
         </>
     );
-};
+}
+
+const Navigation = () => (
+    <Suspense fallback={null}>
+        <NavigationInner />
+    </Suspense>
+);
 
 export default Navigation;
