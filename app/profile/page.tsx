@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import PageHero from "@/components/PageHero";
 import ProfileForm from "@/components/ProfileForm";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuth } from "@/lib/admin/auth";
 
 export const metadata: Metadata = {
     title: "Account | Atlas Build",
@@ -10,12 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) redirect("/?login=1");
+    const { supabase, user } = await requireAuth();
 
     const { data: profile } = await supabase
         .from("profiles")

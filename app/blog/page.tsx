@@ -2,14 +2,21 @@ import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { blogPosts } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo/site";
+import { getPageHero } from "@/lib/content/cms";
 
 export const metadata = buildMetadata("blog");
 
-export default function BlogPage() {
+export default async function BlogPage() {
+    const hero = await getPageHero("blog");
     const featured = blogPosts[0];
     return (
         <div className="bg-white min-h-screen">
-            <PageHero number="06" label="Intelligence" title="Industry signals" description="Verified facts from BLS, OSHA, and market research." />
+            <PageHero
+                number={hero.number ?? "06"}
+                label={hero.label ?? "Intelligence"}
+                title={hero.title ?? "Industry signals"}
+                description={hero.description ?? ""}
+            />
             <section className="py-16 border-b border-line">
                 <div className="max-w-7xl mx-auto px-6 md:px-10">
                     <p className="text-[10px] tracking-[0.22em] uppercase text-safety font-bold mb-4">Featured</p>

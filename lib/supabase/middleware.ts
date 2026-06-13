@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = ["/portal", "/profile"];
+const AUTH_PREFIXES = ["/portal", "/profile"];
+const ADMIN_PREFIX = "/admin";
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });
@@ -29,15 +30,36 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    const isProtected = PROTECTED_PREFIXES.some((p) =>
-        request.nextUrl.pathname.startsWith(p),
-    );
+    const pathname = request.nextUrl.pathname;
+    const needsAuth = AUTH_PREFIXES.some((p) => pathname.startsWith(p));
+    const needsAdmin = pathname.startsWith(ADMIN_PREFIX);
 
-    if (!user && isProtected) {
+    if (!user && (needsAuth || needsAdmin)) {
         const url = request.nextUrl.clone();
         url.pathname = "/";
         url.searchParams.set("login", "1");
         return NextResponse.redirect(url);
+    }
+
+    if (user && (needsAuth || needsAdmin)) {
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+
+        if (profile?.role === "restricted" && needsAuth) {
+            const url = request.nextUrl.clone();
+            url.pathname = "/";
+            url.searchParams.set("restricted", "1");
+            return NextResponse.redirect(url);
+        }
+
+        if (needsAdmin && profile?.role !== "admin") {
+            const url = request.nextUrl.clone();
+            url.pathname = "/";
+            return NextResponse.redirect(url);
+        }
     }
 
     return supabaseResponse;

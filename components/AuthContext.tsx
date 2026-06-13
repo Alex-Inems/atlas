@@ -11,17 +11,20 @@ import {
 } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { UserRole } from "@/lib/types/database";
 
 export interface AuthUser {
     id: string;
     email: string;
     name: string;
+    role: UserRole;
 }
 
 interface AuthContextType {
     user: AuthUser | null;
     isLoading: boolean;
     isAuthenticated: boolean;
+    isAdmin: boolean;
     login: (email: string, password: string) => Promise<{ error: string | null }>;
     signup: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
     logout: () => Promise<void>;
@@ -33,23 +36,27 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mapUser = (supabaseUser: SupabaseUser, fullName?: string | null): AuthUser => ({
+const mapUser = (
+    supabaseUser: SupabaseUser,
+    profile?: { full_name?: string | null; role?: UserRole } | null,
+): AuthUser => ({
     id: supabaseUser.id,
     email: supabaseUser.email ?? "",
     name:
-        fullName ??
+        profile?.full_name ??
         supabaseUser.user_metadata?.full_name ??
         supabaseUser.email?.split("@")[0] ??
         "User",
+    role: profile?.role ?? "user",
 });
 
-async function fetchProfileName(supabase: ReturnType<typeof createClient>, userId: string) {
+async function fetchProfile(supabase: ReturnType<typeof createClient>, userId: string) {
     const { data } = await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, role")
         .eq("id", userId)
         .single();
-    return data?.full_name ?? null;
+    return data;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -63,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setUser(null);
                 return;
             }
-            const fullName = await fetchProfileName(supabase, supabaseUser.id);
-            setUser(mapUser(supabaseUser, fullName));
+            const profile = await fetchProfile(supabase, supabaseUser.id);
+            setUser(mapUser(supabaseUser, profile));
         },
         [supabase],
     );
@@ -142,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user,
                 isLoading,
                 isAuthenticated: !!user,
+                isAdmin: user?.role === "admin",
                 login,
                 signup,
                 logout,

@@ -29,7 +29,7 @@ function NavigationInner() {
     const pastHero = useScrollPastElement(HERO_ELEMENT_ID, HERO_SCROLL_OFFSET);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [authOpen, setAuthOpen] = useState(false);
-    const { user, logout, isLoading } = useAuth();
+    const { user, logout, isLoading, isAdmin } = useAuth();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
@@ -46,6 +46,14 @@ function NavigationInner() {
             >
                 Portal
             </Link>
+            {isAdmin && (
+                <Link
+                    href="/admin"
+                    className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
+                >
+                    Admin
+                </Link>
+            )}
             <Link
                 href="/profile"
                 className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors max-w-[120px] truncate ${navActionClass(surface)}`}
@@ -179,6 +187,16 @@ function NavigationInner() {
                                         Portal
                                         <ArrowUpRight className="w-5 h-5 opacity-30" />
                                     </Link>
+                                    {isAdmin && (
+                                        <Link
+                                            href="/admin"
+                                            onClick={() => setMobileOpen(false)}
+                                            className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                        >
+                                            Admin
+                                            <ArrowUpRight className="w-5 h-5 opacity-30" />
+                                        </Link>
+                                    )}
                                     <Link
                                         href="/profile"
                                         onClick={() => setMobileOpen(false)}

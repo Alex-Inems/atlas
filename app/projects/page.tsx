@@ -4,17 +4,20 @@ import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { landmarkProjects } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo/site";
+import { getPageHero } from "@/lib/content/cms";
 
 export const metadata = buildMetadata("projects");
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+    const hero = await getPageHero("projects");
+
     return (
         <div className="bg-white min-h-screen">
             <PageHero
-                number="01"
-                label="Portfolio"
-                title="Landmark deliveries"
-                description="Real completions with verified architects, contractors, heights, and dates — the global standard we build toward."
+                number={hero.number ?? "01"}
+                label={hero.label ?? "Portfolio"}
+                title={hero.title ?? "Landmark deliveries"}
+                description={hero.description ?? ""}
             />
 
             <section className="py-16 md:py-24">

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import PageHero from "@/components/PageHero";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuth } from "@/lib/admin/auth";
 import { PROJECT_STATUS_LABELS, type ClientProject } from "@/lib/types/database";
 
 export const metadata: Metadata = {
@@ -18,12 +17,7 @@ const statusColor: Record<ClientProject["status"], string> = {
 };
 
 export default async function PortalPage() {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) redirect("/?login=1");
+    const { supabase, user } = await requireAuth();
 
     const { data: projects } = await supabase
         .from("client_projects")

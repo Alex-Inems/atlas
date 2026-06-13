@@ -2,17 +2,20 @@ import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { leadership, companyInfo } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo/site";
+import { getPageHero } from "@/lib/content/cms";
 
 export const metadata = buildMetadata("team");
 
-export default function TeamPage() {
+export default async function TeamPage() {
+    const hero = await getPageHero("team");
+
     return (
         <div className="bg-white min-h-screen">
             <PageHero
-                number="05"
-                label="People"
-                title="Built by specialists"
-                description={`${companyInfo.legalName} — founded ${companyInfo.founded}, drawing on construction industry heritage dating to the 1940s.`}
+                number={hero.number ?? "05"}
+                label={hero.label ?? "People"}
+                title={hero.title ?? "Built by specialists"}
+                description={hero.description ?? `${companyInfo.legalName} — founded ${companyInfo.founded}.`}
             />
 
             <section className="py-16 md:py-24">

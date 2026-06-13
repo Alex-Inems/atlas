@@ -2,6 +2,7 @@ import PageHero from "@/components/PageHero";
 import PageCTA from "@/components/PageCTA";
 import { processSteps } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo/site";
+import { getPageHero } from "@/lib/content/cms";
 
 export const metadata = buildMetadata("process");
 
@@ -13,14 +14,16 @@ const phaseImages = [
     "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80",
 ];
 
-export default function ProcessPage() {
+export default async function ProcessPage() {
+    const hero = await getPageHero("process");
+
     return (
         <div className="bg-white min-h-screen">
             <PageHero
-                number="03"
-                label="Method"
-                title="The Atlas method"
-                description="Five gated phases. Every deliverable documented. BIM coordination from design development onward."
+                number={hero.number ?? "03"}
+                label={hero.label ?? "Method"}
+                title={hero.title ?? "Five phases. Zero surprises."}
+                description={hero.description ?? ""}
             />
 
             <section className="py-16 md:py-24">
