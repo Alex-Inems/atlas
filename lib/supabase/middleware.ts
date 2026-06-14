@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { syncUserProfile } from "@/lib/admin/bootstrap";
 
 const AUTH_PREFIXES = ["/portal", "/profile"];
 const ADMIN_PREFIX = "/admin";
@@ -42,6 +43,12 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user && (needsAuth || needsAdmin)) {
+        await syncUserProfile({
+            userId: user.id,
+            email: user.email ?? "",
+            fullName: user.user_metadata?.full_name as string | undefined,
+        });
+
         const { data: profile } = await supabase
             .from("profiles")
             .select("role")

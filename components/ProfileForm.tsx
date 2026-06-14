@@ -8,9 +8,10 @@ import { useAuth } from "@/components/AuthContext";
 interface ProfileFormProps {
     initialName: string;
     email: string;
+    dark?: boolean;
 }
 
-export default function ProfileForm({ initialName, email }: ProfileFormProps) {
+export default function ProfileForm({ initialName, email, dark = false }: ProfileFormProps) {
     const { updateProfile, updatePassword, logout } = useAuth();
     const [name, setName] = useState(initialName);
     const [password, setPassword] = useState("");
@@ -22,8 +23,13 @@ export default function ProfileForm({ initialName, email }: ProfileFormProps) {
     const [profileLoading, setProfileLoading] = useState(false);
     const [passwordLoading, setPasswordLoading] = useState(false);
 
-    const input =
-        "w-full py-4 border-b border-line bg-transparent focus:border-safety focus:outline-none text-charcoal";
+    const input = dark
+        ? "sb-input"
+        : "w-full py-4 border-b border-line bg-transparent focus:border-safety focus:outline-none text-charcoal";
+
+    const label = dark
+        ? "sb-label"
+        : "block text-[11px] tracking-[0.18em] uppercase font-bold text-muted mb-2";
 
     const handleProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,19 +67,100 @@ export default function ProfileForm({ initialName, email }: ProfileFormProps) {
         }
     };
 
+    if (dark) {
+        return (
+            <div className="space-y-6">
+                <div className="sb-card">
+                    <div className="sb-card-header">
+                        <h2 className="sb-card-title">Profile</h2>
+                    </div>
+                    <form onSubmit={handleProfile} className="sb-card-body-padded">
+                        <div className="sb-field">
+                            <label className={label}>Email</label>
+                            <input type="email" value={email} disabled className={input} />
+                        </div>
+                        <div className="sb-field">
+                            <label className={label}>Full name</label>
+                            <input
+                                type="text"
+                                required
+                                className={input}
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                        {profileError && <div className="sb-alert sb-alert-error">{profileError}</div>}
+                        {profileMsg && <div className="sb-alert sb-alert-success">{profileMsg}</div>}
+                        <button
+                            type="submit"
+                            disabled={profileLoading}
+                            className="sb-btn sb-btn-primary"
+                        >
+                            {profileLoading && <Loader2 className="w-3.5 h-3.5 sb-spin" />}
+                            Save profile
+                        </button>
+                    </form>
+                </div>
+
+                <div className="sb-card">
+                    <div className="sb-card-header">
+                        <h2 className="sb-card-title">Password</h2>
+                    </div>
+                    <form onSubmit={handlePassword} className="sb-card-body-padded">
+                        <div className="sb-field">
+                            <label className={label}>New password</label>
+                            <input
+                                type="password"
+                                minLength={6}
+                                className={input}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className="sb-field">
+                            <label className={label}>Confirm password</label>
+                            <input
+                                type="password"
+                                minLength={6}
+                                className={input}
+                                value={confirm}
+                                onChange={(e) => setConfirm(e.target.value)}
+                            />
+                        </div>
+                        {passwordError && <div className="sb-alert sb-alert-error">{passwordError}</div>}
+                        {passwordMsg && <div className="sb-alert sb-alert-success">{passwordMsg}</div>}
+                        <button
+                            type="submit"
+                            disabled={passwordLoading || !password}
+                            className="sb-btn sb-btn-default"
+                        >
+                            {passwordLoading && <Loader2 className="w-3.5 h-3.5 sb-spin" />}
+                            Update password
+                        </button>
+                    </form>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                    <Link href="/portal" className="sb-btn sb-btn-ghost sb-btn-sm">
+                        ← Back to portal
+                    </Link>
+                    <button type="button" onClick={() => logout()} className="sb-btn sb-btn-ghost sb-btn-sm">
+                        Log out
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-16">
             <form onSubmit={handleProfile} className="space-y-8">
                 <div>
-                    <label className="block text-[11px] tracking-[0.18em] uppercase font-bold text-muted mb-2">
-                        Email
-                    </label>
+                    <label className={label}>Email</label>
                     <input type="email" value={email} disabled className={`${input} opacity-50`} />
                 </div>
                 <div>
-                    <label className="block text-[11px] tracking-[0.18em] uppercase font-bold text-muted mb-2">
-                        Full name
-                    </label>
+                    <label className={label}>Full name</label>
                     <input
                         type="text"
                         required
@@ -103,9 +190,7 @@ export default function ProfileForm({ initialName, email }: ProfileFormProps) {
             <form onSubmit={handlePassword} className="space-y-8 pt-8 border-t border-line">
                 <h2 className="text-xl font-black text-charcoal">Change password</h2>
                 <div>
-                    <label className="block text-[11px] tracking-[0.18em] uppercase font-bold text-muted mb-2">
-                        New password
-                    </label>
+                    <label className={label}>New password</label>
                     <input
                         type="password"
                         minLength={6}
@@ -115,9 +200,7 @@ export default function ProfileForm({ initialName, email }: ProfileFormProps) {
                     />
                 </div>
                 <div>
-                    <label className="block text-[11px] tracking-[0.18em] uppercase font-bold text-muted mb-2">
-                        Confirm password
-                    </label>
+                    <label className={label}>Confirm password</label>
                     <input
                         type="password"
                         minLength={6}

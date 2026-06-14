@@ -210,26 +210,26 @@ export const blogPosts = [
 ] as const satisfies readonly BlogPost[];
 
 export const companyInfo = {
-    name: "Atlas Build",
-    legalName: "PT Atlas Jaya Konstruksi",
+    name: "Inema",
+    legalName: "PT Inema Konstruksi",
     founded: "2020",
     headquarters: "Jl. Dr. Makaliwe Raya No. 28, West Jakarta, Indonesia",
     phone: "+62 812-9111-1887",
-    email: "info@atlasbuildconstruction.com",
-    website: "atlasbuildconstruction.com",
+    email: "inema9886@gmail.com",
+    website: "inema.build",
     employees: "18+",
     description: "Full-service general contractor and design-build firm delivering civil, structural, architectural, and MEP works across residential and commercial sectors.",
 } as const satisfies CompanyInfo;
 
 export const leadership = [
-    { name: "Yandhika Wijaya", role: "Deputy Head of Operations", note: "Atlas Build & Construction, Jakarta" },
+    { name: "Yandhika Wijaya", role: "Deputy Head of Operations", note: "Inema Construction, Jakarta" },
     { name: "Operations Team", role: "Project Management", note: "Multi-sector construction since 1940s industry heritage" },
     { name: "Design Studio", role: "Architectural & MEP Consultancy", note: "Structural, interior, and furniture design" },
     { name: "Field Division", role: "Site Execution", note: "Civil, façade, and specialist applicator teams" },
 ] as const satisfies readonly Leader[];
 
 export const testimonial = {
-    quote: "Atlas Build delivered beyond expectations. The professionalism, precision, and execution were world class.",
+    quote: "Inema delivered beyond expectations. The professionalism, precision, and execution were world class.",
     author: "Jonathan Reed",
     role: "CEO, Prime Developments",
 } as const satisfies Testimonial;

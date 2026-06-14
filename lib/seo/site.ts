@@ -4,6 +4,8 @@ import { companyInfo } from "@/lib/data";
 export const siteName = companyInfo.name;
 export const siteUrl = `https://${companyInfo.website}`;
 
+export const pageTitle = (label: string) => `${label} | ${siteName}`;
+
 export const defaultDescription =
     "Jakarta construction company — one team from planning to handover. Offices, commercial, and residential builds with clear timelines and weekly updates.";
 
@@ -23,37 +25,37 @@ interface PageSeo {
 
 export const pageSeo: Record<PageKey, PageSeo> = {
     home: {
-        title: "Atlas Build | Construction Company Jakarta",
+        title: `${siteName} | Construction Company Jakarta`,
         description:
             "One team from planning to handover. Offices, commercial, and residential builds in Jakarta—clear timelines, weekly updates, no surprises.",
     },
     projects: {
-        title: "Our Projects | Atlas Build Jakarta",
+        title: `Our Projects | ${siteName} Jakarta`,
         description:
             "See the kind of buildings we deliver—landmark towers and complex sites handled with care, precision, and on-time completion.",
     },
     services: {
-        title: "What We Build | Atlas Build",
+        title: `What We Build | ${siteName}`,
         description:
             "Design, structure, interiors, and systems—one company accountable for your whole project. Less coordination for you, better results.",
     },
     process: {
-        title: "How We Work | Atlas Build",
+        title: `How We Work | ${siteName}`,
         description:
             "Five simple phases: discover, design, plan, build, hand over. You always know what's happening and what's next.",
     },
     team: {
-        title: "Our Team | Atlas Build Jakarta",
+        title: `Our Team | ${siteName} Jakarta`,
         description:
             "Experienced project leaders based in Jakarta. Real people you can call—not a faceless contractor.",
     },
     blog: {
-        title: "Insights | Atlas Build",
+        title: `Insights | ${siteName}`,
         description:
             "Practical updates on construction, safety, and building trends—written in plain language, backed by real data.",
     },
     contact: {
-        title: "Get a Quote | Atlas Build Jakarta",
+        title: `Get a Quote | ${siteName} Jakarta`,
         description: `Tell us about your project. We respond within one business day. Call ${companyInfo.phone} or email ${companyInfo.email}.`,
     },
 };

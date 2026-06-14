@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Menu, X } from "lucide-react";
@@ -22,6 +22,7 @@ import {
     navMenuIconClass,
     navActiveUnderlineClass,
     navActiveLayoutId,
+    navHeaderClass,
 } from "@/lib/navigation/theme";
 import { MOTION } from "@/lib/motion/tokens";
 
@@ -32,9 +33,21 @@ function NavigationInner() {
     const { user, logout, isLoading, isAdmin } = useAuth();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [pendingAdminBookings, setPendingAdminBookings] = useState(0);
 
-    const surface = resolveNavSurface(pathname === "/", pastHero);
+    const surface = resolveNavSurface(pathname, pathname === "/", pastHero);
     const loginRedirect = searchParams.get("login") === "1" && !user && !isLoading;
+
+    useEffect(() => {
+        if (!isAdmin || isLoading) {
+            setPendingAdminBookings(0);
+            return;
+        }
+        fetch("/api/alerts/summary")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => setPendingAdminBookings(d?.pendingBookingsAdmin ?? 0))
+            .catch(() => {});
+    }, [isAdmin, isLoading, pathname]);
 
     useBodyScrollLock(mobileOpen);
 
@@ -48,10 +61,15 @@ function NavigationInner() {
             </Link>
             {isAdmin && (
                 <Link
-                    href="/admin"
-                    className={`hidden md:block text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
+                    href="/admin/bookings"
+                    className={`hidden md:inline-flex items-center text-[11px] tracking-[0.18em] uppercase font-semibold transition-colors ${navActionClass(surface)}`}
                 >
                     Admin
+                    {pendingAdminBookings > 0 && (
+                        <span className="nav-alert-badge" title="Pending bookings">
+                            {pendingAdminBookings > 9 ? "9+" : pendingAdminBookings}
+                        </span>
+                    )}
                 </Link>
             )}
             <Link
@@ -79,9 +97,14 @@ function NavigationInner() {
         </button>
     );
 
+    const isDashboard = surface === "dashboard";
+    const mobileItemClass = `flex items-center justify-between py-4 border-b text-2xl font-black tracking-tight ${
+        isDashboard ? "border-white/10 text-white" : "border-line text-charcoal"
+    }`;
+
     return (
         <>
-            <header className="fixed top-0 inset-x-0 z-50 pointer-events-none">
+            <header className={`fixed top-0 inset-x-0 z-50 pointer-events-none ${navHeaderClass(surface)}`}>
                 <div className="max-w-7xl mx-auto px-6 md:px-10 pointer-events-auto">
                     <nav className="flex items-center justify-between h-20 md:h-24">
                         <Link href="/" className="flex items-center gap-3 group">
@@ -91,7 +114,7 @@ function NavigationInner() {
                             <span
                                 className={`text-sm font-black tracking-[0.32em] transition-colors ${navLogoTextClass(surface)}`}
                             >
-                                ATLAS
+                                INEMA
                             </span>
                         </Link>
 
@@ -141,19 +164,25 @@ function NavigationInner() {
             <AnimatePresence>
                 {mobileOpen && (
                     <motion.div
-                        className="fixed inset-0 z-[60] bg-white lg:hidden"
+                        className={`fixed inset-0 z-[60] lg:hidden ${isDashboard ? "bg-[#141414]" : "bg-white"}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: MOTION.duration.navMenu }}
                     >
-                        <div className="flex items-center justify-between h-20 px-6 border-b border-line">
+                        <div
+                            className={`flex items-center justify-between h-20 px-6 border-b ${isDashboard ? "border-white/10" : "border-line"}`}
+                        >
                             <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3">
-                                <span className="block w-8 h-px bg-safety" />
-                                <span className="text-sm font-black tracking-[0.32em] text-charcoal">ATLAS</span>
+                                <span className={`block w-8 h-px ${isDashboard ? "bg-[#3ecf8e]" : "bg-safety"}`} />
+                                <span
+                                    className={`text-sm font-black tracking-[0.32em] ${isDashboard ? "text-white" : "text-charcoal"}`}
+                                >
+                                    INEMA
+                                </span>
                             </Link>
                             <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-                                <X className="w-5 h-5 text-charcoal" />
+                                <X className={`w-5 h-5 ${isDashboard ? "text-white" : "text-charcoal"}`} />
                             </button>
                         </div>
 
@@ -168,8 +197,16 @@ function NavigationInner() {
                                     <Link
                                         href={href}
                                         onClick={() => setMobileOpen(false)}
-                                        className={`flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight ${
-                                            pathname === href ? "text-safety" : "text-charcoal"
+                                        className={`flex items-center justify-between py-4 border-b text-2xl font-black tracking-tight ${
+                                            isDashboard ? "border-white/10" : "border-line"
+                                        } ${
+                                            pathname === href
+                                                ? isDashboard
+                                                    ? "text-[#3ecf8e]"
+                                                    : "text-safety"
+                                                : isDashboard
+                                                  ? "text-white"
+                                                  : "text-charcoal"
                                         }`}
                                     >
                                         {label}
@@ -182,25 +219,28 @@ function NavigationInner() {
                                     <Link
                                         href="/portal"
                                         onClick={() => setMobileOpen(false)}
-                                        className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                        className={mobileItemClass}
                                     >
                                         Portal
                                         <ArrowUpRight className="w-5 h-5 opacity-30" />
                                     </Link>
                                     {isAdmin && (
                                         <Link
-                                            href="/admin"
+                                            href="/admin/bookings"
                                             onClick={() => setMobileOpen(false)}
-                                            className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                            className={mobileItemClass}
                                         >
                                             Admin
+                                            {pendingAdminBookings > 0
+                                                ? ` (${pendingAdminBookings})`
+                                                : ""}
                                             <ArrowUpRight className="w-5 h-5 opacity-30" />
                                         </Link>
                                     )}
                                     <Link
                                         href="/profile"
                                         onClick={() => setMobileOpen(false)}
-                                        className="flex items-center justify-between py-4 border-b border-line text-2xl font-black tracking-tight text-charcoal"
+                                        className={mobileItemClass}
                                     >
                                         {user.name}
                                         <ArrowUpRight className="w-5 h-5 opacity-30" />
@@ -209,18 +249,24 @@ function NavigationInner() {
                             )}
                         </div>
 
-                        <div className="absolute bottom-0 inset-x-0 p-6 border-t border-line flex gap-4">
+                        <div
+                            className={`absolute bottom-0 inset-x-0 p-6 border-t flex gap-4 ${isDashboard ? "border-white/10" : "border-line"}`}
+                        >
                             {user ? (
-                                <button
+                                    <button
                                     type="button"
                                     onClick={() => {
                                         logout();
                                         setMobileOpen(false);
                                     }}
-                                    className="flex-1 py-4 text-[11px] tracking-[0.18em] uppercase font-bold text-charcoal border border-line"
+                                    className={`flex-1 py-4 text-[11px] tracking-[0.18em] uppercase font-bold border ${
+                                        isDashboard
+                                            ? "text-white border-white/20"
+                                            : "text-charcoal border-line"
+                                    }`}
                                 >
                                     Log out
-                                </button>
+                                    </button>
                             ) : (
                                 <button
                                     type="button"
@@ -233,7 +279,7 @@ function NavigationInner() {
                                     Portal
                                 </button>
                             )}
-                            <Link
+                                <Link
                                 href="/contact"
                                 onClick={() => setMobileOpen(false)}
                                 className="flex-1 py-4 text-center text-[11px] tracking-[0.18em] uppercase font-bold bg-safety text-white"

@@ -70,6 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setUser(null);
                 return;
             }
+
+            try {
+                await fetch("/api/auth/sync", { method: "POST" });
+            } catch {
+                // Profile sync is best-effort; fall back to direct read.
+            }
+
             const profile = await fetchProfile(supabase, supabaseUser.id);
             setUser(mapUser(supabaseUser, profile));
         },

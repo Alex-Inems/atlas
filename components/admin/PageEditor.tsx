@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Code2, Save } from "lucide-react";
 import { savePageContent } from "@/lib/actions/admin";
-
-const inputClass =
-    "w-full py-3 px-4 border border-line bg-white focus:border-safety focus:outline-none text-charcoal text-sm";
 
 const COMPANY_KEYS = [
     "name",
@@ -54,7 +51,7 @@ export default function PageEditor({
             try {
                 payload = JSON.parse(jsonContent);
             } catch {
-                setError("Invalid JSON. Check syntax.");
+                setError("Invalid JSON. Check syntax and try again.");
                 return;
             }
         } else if (slug === "company") {
@@ -66,105 +63,115 @@ export default function PageEditor({
         startTransition(async () => {
             const result = await savePageContent(slug, payload);
             if (result.error) setError(result.error);
-            else setMessage(`"${title}" saved. Changes are live on the site.`);
+            else setMessage(`Row updated. Changes are live on the site.`);
         });
     };
 
     return (
-        <div className="bg-white border border-line p-6 md:p-8 space-y-6">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="text-xl font-black text-charcoal">{title}</h2>
+        <div className="sb-card">
+            <div className="sb-card-header">
+                <div>
+                    <h2 className="sb-card-title">site_pages / {slug}</h2>
+                    <p className="sb-cell-mono" style={{ marginTop: 4, fontSize: 11 }}>
+                        content jsonb column
+                    </p>
+                </div>
                 <button
                     type="button"
                     onClick={() => setUseJson(!useJson)}
-                    className="text-[10px] uppercase tracking-widest font-bold text-muted hover:text-charcoal"
+                    className="sb-btn sb-btn-default sb-btn-sm"
                 >
-                    {useJson ? "Simple fields" : "Advanced JSON"}
+                    <Code2 className="w-3.5 h-3.5" />
+                    {useJson ? "Form editor" : "JSON editor"}
                 </button>
             </div>
 
-            {useJson ? (
-                <textarea
-                    value={jsonContent}
-                    onChange={(e) => setJsonContent(e.target.value)}
-                    rows={18}
-                    className={`${inputClass} font-mono text-xs`}
-                />
-            ) : slug === "company" ? (
-                <div className="grid gap-4">
-                    {COMPANY_KEYS.map((key) => (
-                        <div key={key}>
-                            <label className="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
-                                {key}
-                            </label>
+            <div className="sb-card-body-padded">
+                {useJson ? (
+                    <div className="sb-field">
+                        <label className="sb-label">content (jsonb)</label>
+                        <textarea
+                            value={jsonContent}
+                            onChange={(e) => setJsonContent(e.target.value)}
+                            rows={20}
+                            className="sb-textarea"
+                            style={{ fontFamily: "var(--font-geist-mono)", fontSize: 12 }}
+                        />
+                    </div>
+                ) : slug === "company" ? (
+                    <div className="sb-form-grid">
+                        {COMPANY_KEYS.map((key) => (
+                            <div key={key} className="sb-field">
+                                <label className="sb-label">{key}</label>
+                                <input
+                                    className="sb-input"
+                                    value={companyFields[key] ?? ""}
+                                    onChange={(e) =>
+                                        setCompanyFields((c) => ({ ...c, [key]: e.target.value }))
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="sb-form-grid">
+                        <div className="sb-field">
+                            <label className="sb-label">number</label>
                             <input
-                                className={inputClass}
-                                value={companyFields[key] ?? ""}
+                                className="sb-input"
+                                value={fields.number}
+                                onChange={(e) => setFields((f) => ({ ...f, number: e.target.value }))}
+                            />
+                        </div>
+                        <div className="sb-field">
+                            <label className="sb-label">label</label>
+                            <input
+                                className="sb-input"
+                                value={fields.label}
+                                onChange={(e) => setFields((f) => ({ ...f, label: e.target.value }))}
+                            />
+                        </div>
+                        <div className="sb-field" style={{ gridColumn: "1 / -1" }}>
+                            <label className="sb-label">title</label>
+                            <input
+                                className="sb-input"
+                                value={fields.title}
+                                onChange={(e) => setFields((f) => ({ ...f, title: e.target.value }))}
+                            />
+                        </div>
+                        <div className="sb-field" style={{ gridColumn: "1 / -1" }}>
+                            <label className="sb-label">description</label>
+                            <textarea
+                                className="sb-textarea"
+                                rows={4}
+                                value={fields.description}
                                 onChange={(e) =>
-                                    setCompanyFields((c) => ({ ...c, [key]: e.target.value }))
+                                    setFields((f) => ({ ...f, description: e.target.value }))
                                 }
                             />
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="grid gap-4">
-                    <div>
-                        <label className="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
-                            Section number
-                        </label>
-                        <input
-                            className={inputClass}
-                            value={fields.number}
-                            onChange={(e) => setFields((f) => ({ ...f, number: e.target.value }))}
-                        />
                     </div>
-                    <div>
-                        <label className="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
-                            Label
-                        </label>
-                        <input
-                            className={inputClass}
-                            value={fields.label}
-                            onChange={(e) => setFields((f) => ({ ...f, label: e.target.value }))}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
-                            Title
-                        </label>
-                        <input
-                            className={inputClass}
-                            value={fields.title}
-                            onChange={(e) => setFields((f) => ({ ...f, title: e.target.value }))}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
-                            Description
-                        </label>
-                        <textarea
-                            className={`${inputClass} resize-none`}
-                            rows={4}
-                            value={fields.description}
-                            onChange={(e) => setFields((f) => ({ ...f, description: e.target.value }))}
-                        />
-                    </div>
-                </div>
-            )}
+                )}
 
-            {message && <p className="text-sm bg-premium border border-line px-4 py-3">{message}</p>}
-            {error && <p className="text-sm bg-red-50 text-red-700 px-4 py-3 rounded-lg">{error}</p>}
+                {message && <div className="sb-alert sb-alert-success">{message}</div>}
+                {error && <div className="sb-alert sb-alert-error">{error}</div>}
 
-            <button
-                type="button"
-                onClick={handleSave}
-                disabled={pending}
-                className="inline-flex items-center gap-2 bg-safety text-white px-8 py-3 text-xs uppercase font-bold tracking-widest disabled:opacity-50"
-            >
-                {pending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Save page
-            </button>
+                <div className="flex gap-2 mt-4">
+                    <button
+                        type="button"
+                        onClick={handleSave}
+                        disabled={pending}
+                        className="sb-btn sb-btn-primary"
+                    >
+                        {pending ? (
+                            <Loader2 className="w-3.5 h-3.5 sb-spin" />
+                        ) : (
+                            <Save className="w-3.5 h-3.5" />
+                        )}
+                        Save changes
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

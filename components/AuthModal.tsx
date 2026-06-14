@@ -266,7 +266,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     Forgot password?
                                 </button>
                                 <p>
-                                    New to Atlas Build?
+                                    New to Inema?
                                     <button
                                         type="button"
                                         onClick={() => {

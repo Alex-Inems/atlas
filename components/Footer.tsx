@@ -10,7 +10,7 @@ const Footer = () => (
                 <div className="md:col-span-5">
                     <div className="flex items-center gap-3 mb-6">
                         <span className="w-8 h-px bg-safety" />
-                        <span className="text-sm font-black tracking-[0.32em]">ATLAS</span>
+                        <span className="text-sm font-black tracking-[0.32em]">INEMA</span>
                     </div>
                     <p className="text-white/40 text-sm leading-relaxed max-w-sm">{companyInfo.description}</p>
                     <p className="text-[10px] text-white/25 mt-4">{companyInfo.legalName} · Est. {companyInfo.founded}</p>

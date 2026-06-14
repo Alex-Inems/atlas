@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import type { Profile } from "@/lib/types/database";
 
 export const metadata: Metadata = {
-    title: "Users | Admin",
+    title: "Users | Inema",
     robots: { index: false, follow: false },
 };
 
@@ -18,7 +18,10 @@ export default async function AdminUsersPage() {
         .order("created_at", { ascending: false });
 
     return (
-        <AdminShell title="User management">
+        <AdminShell
+            title="Users"
+            description="Manage user accounts, roles, and access restrictions for your project."
+        >
             <UserManagementTable users={(users as Profile[]) ?? []} currentUserId={user.id} />
         </AdminShell>
     );

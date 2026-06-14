@@ -6,7 +6,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { EDITABLE_PAGE_SLUGS } from "@/lib/types/database";
 
 export const metadata: Metadata = {
-    title: "Edit page | Admin",
+    title: "Edit row | Inema",
     robots: { index: false, follow: false },
 };
 
@@ -26,7 +26,10 @@ export default async function AdminEditPagePage({
     if (!page) notFound();
 
     return (
-        <AdminShell title={`Edit: ${page.title}`}>
+        <AdminShell
+            title={page.title}
+            description={`Editing site_pages row where slug = '${page.slug}'`}
+        >
             <PageEditor
                 slug={page.slug}
                 title={page.title}

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { syncUserProfile } from "@/lib/admin/bootstrap";
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/lib/types/database";
 
@@ -9,6 +10,12 @@ export async function getSessionProfile() {
     } = await supabase.auth.getUser();
 
     if (!user) return { supabase, user: null, profile: null };
+
+    await syncUserProfile({
+        userId: user.id,
+        email: user.email ?? "",
+        fullName: user.user_metadata?.full_name,
+    });
 
     const { data: profile } = await supabase
         .from("profiles")

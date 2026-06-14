@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import PageHero from "@/components/PageHero";
+import AppPageHero from "@/components/portal/AppPageHero";
 import ProfileForm from "@/components/ProfileForm";
+import AccountStatus from "@/components/AccountStatus";
 import { requireAuth } from "@/lib/admin/auth";
 
 export const metadata: Metadata = {
-    title: "Account | Atlas Build",
+    title: "Account | Inema",
     robots: { index: false, follow: false },
 };
 
 export default async function ProfilePage() {
-    const { supabase, user } = await requireAuth();
-
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", user.id)
-        .single();
+    const { user, profile } = await requireAuth();
 
     const initialName =
         profile?.full_name ??
@@ -24,18 +19,16 @@ export default async function ProfilePage() {
         "";
 
     return (
-        <div className="bg-white min-h-screen">
-            <PageHero
-                number="—"
+        <div className="sb-app-page">
+            <AppPageHero
                 label="Account"
                 title="Profile settings"
                 description="Update your name and password."
             />
-            <section className="py-16">
-                <div className="max-w-lg mx-auto px-6 md:px-10">
-                    <ProfileForm initialName={initialName} email={user.email ?? ""} />
-                </div>
-            </section>
+            <div className="sb-content-wrap-narrow">
+                <AccountStatus role={profile?.role} email={user.email ?? ""} />
+                <ProfileForm initialName={initialName} email={user.email ?? ""} dark />
+            </div>
         </div>
     );
 }
